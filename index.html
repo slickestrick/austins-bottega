@@ -7,8 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <style>
 :root {
   --bg:        #F7F8FB;
@@ -1209,12 +1207,19 @@ body {
 </div>
 
 <script>
-gsap.registerPlugin(ScrollTrigger);
+if(typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") { gsap.registerPlugin(ScrollTrigger); }
 
+document.addEventListener("DOMContentLoaded", function() {
 // ── CURSOR GLOW ──
 const glow = document.getElementById("cursorGlow");
 document.addEventListener("mousemove", e => {
-  gsap.to(glow, { x: e.clientX, y: e.clientY, duration: 0.6, ease: "power2.out" });
+  if(glow) {
+    glow.style.left = e.clientX + "px";
+    glow.style.top  = e.clientY + "px";
+    if(typeof gsap !== "undefined") {
+      gsap.to(glow, { x: 0, y: 0, duration: 0.6, ease: "power2.out" });
+    }
+  }
 });
 
 // ── WEBGL PARTICLES ──
@@ -1588,5 +1593,23 @@ document.addEventListener("mouseup", ()=>{
   document.body.style.userSelect="";
 });
 </script>
+
+  <!-- GSAP loaded after DOM so JS errors don't block page -->
+  <script>
+  function loadScript(src, cb){
+    var s = document.createElement("script");
+    s.src = src;
+    s.onload = cb;
+    s.onerror = function(){ console.warn("Failed to load: " + src); if(cb) cb(); };
+    document.head.appendChild(s);
+  }
+  loadScript("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js", function(){
+    loadScript("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js", function(){
+      if(typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined"){
+        gsap.registerPlugin(ScrollTrigger);
+      }
+    });
+  });
+  </script>
 </body>
 </html>
