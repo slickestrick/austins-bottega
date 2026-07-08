@@ -6,878 +6,1094 @@
 <title>Austin's Bottega</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <style>
-  :root {
-    --bg: #FAFAF8;
-    --surface: #F2F1EE;
-    --surface-raised: #E8E7E3;
-    --accent: #2A9D8F;
-    --accent-light: #E1F5EE;
-    --accent-mid: #9FE1CB;
-    --accent-dark: #0F6E56;
-    --text-primary: #1A1A1A;
-    --text-secondary: #6B6B6B;
-    --text-tertiary: #A8A8A8;
-    --border: rgba(26,26,26,0.07);
-    --border-mid: rgba(26,26,26,0.12);
-    --border-accent: rgba(42,157,143,0.25);
-    --font-display: 'Cormorant Garamond', Georgia, serif;
-    --font-body: 'DM Sans', sans-serif;
-    --font-mono: 'DM Mono', monospace;
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 16px;
-    --radius-xl: 22px;
-    --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { height: 100%; }
-
-  body {
-    background: var(--bg);
-    color: var(--text-primary);
-    font-family: var(--font-body);
-    font-size: 15px;
-    line-height: 1.6;
-    height: 100vh;
-    overflow: hidden;
-    position: relative;
-  }
-
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 9999;
-  }
-
-  /* ── LANDING ── */
-  .landing {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    z-index: 10;
-    transition: opacity 0.55s ease, transform 0.55s ease;
-    overflow: hidden;
-  }
-
-  .landing.exit {
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(0.97);
-  }
-
-  .landing-bg {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  .landing-bg svg {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    opacity: 0.04;
-  }
-
-  .landing-content {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    max-width: 560px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .landing-eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.2em;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 1.1rem;
-    opacity: 0;
-    animation: fade-up 0.7s ease forwards 0.2s;
-  }
-
-  .landing-title {
-    font-family: var(--font-display);
-    font-size: clamp(3rem, 7vw, 5.5rem);
-    font-weight: 300;
-    line-height: 1.05;
-    color: var(--text-primary);
-    margin-bottom: 0.9rem;
-    opacity: 0;
-    animation: fade-up 0.7s ease forwards 0.4s;
-  }
-
-  .landing-title em { font-style: italic; color: var(--accent); }
-
-  .landing-tagline {
-    font-size: 0.93rem;
-    color: var(--text-secondary);
-    font-weight: 300;
-    line-height: 1.65;
-    margin-bottom: 2.2rem;
-    opacity: 0;
-    animation: fade-up 0.7s ease forwards 0.6s;
-  }
-
-  /* ── CHAT WINDOW (landing) ── */
-  .chat-window {
-    width: 100%;
-    background: white;
-    border-radius: var(--radius-xl);
-    border: 1px solid var(--border-mid);
-    box-shadow: 0 8px 40px rgba(0,0,0,0.09);
-    overflow: hidden;
-    opacity: 0;
-    animation: fade-up 0.7s ease forwards 0.8s;
-    display: flex;
-    flex-direction: column;
-    max-height: 50vh;
-  }
-
-  .window-header {
-    padding: 0.85rem 1.2rem;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    flex-shrink: 0;
-  }
-
-  .auxin-avatar {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: var(--accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .auxin-avatar svg { width: 14px; height: 14px; }
-
-  .window-name {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    line-height: 1.2;
-  }
-
-  .window-status {
-    font-size: 0.67rem;
-    font-family: var(--font-mono);
-    color: var(--accent);
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-  }
-
-  .status-dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  .window-body {
-    padding: 1.2rem;
-    overflow-y: auto;
-    flex: 1;
-  }
-
-  .window-body::-webkit-scrollbar { width: 3px; }
-  .window-body::-webkit-scrollbar-thumb { background: var(--accent-mid); border-radius: 3px; }
-
-  .window-message {
-    font-size: 0.9rem;
-    line-height: 1.7;
-    color: var(--text-primary);
-  }
-
-  .auxin-cursor {
-    display: inline-block;
-    width: 2px;
-    height: 0.88em;
-    background: var(--accent);
-    margin-left: 2px;
-    vertical-align: middle;
-    animation: blink 0.9s step-end infinite;
-  }
-
-  .window-options {
-    padding: 0 1.2rem 1.2rem;
-    display: none;
-    flex-direction: column;
-    gap: 0.45rem;
-    flex-shrink: 0;
-  }
-
-  .window-btn {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.72rem 1rem;
-    background: var(--surface);
-    border: 1px solid var(--border-mid);
-    border-radius: var(--radius-md);
-    font-family: var(--font-body);
-    font-size: 0.84rem;
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: var(--transition);
-    text-align: left;
-  }
-
-  .window-btn:hover {
-    background: var(--accent-light);
-    border-color: var(--border-accent);
-    color: var(--accent-dark);
-    transform: translateX(3px);
-  }
-
-  .window-btn-arrow {
-    font-size: 0.72rem;
-    color: var(--text-tertiary);
-    transition: var(--transition);
-  }
-
-  .window-btn:hover .window-btn-arrow { color: var(--accent); }
-
-  /* ── SPLIT VIEW ── */
-  .split-view {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s ease;
-  }
-
-  .split-view.active {
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  /* Chat panel */
-  .chat-panel {
-    width: 360px;
-    min-width: 260px;
-    max-width: 55vw;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    background: var(--surface);
-    border-right: 1px solid var(--border-mid);
-    flex-shrink: 0;
-  }
-
-  .chat-panel-header {
-    padding: 1rem 1.2rem;
-    background: white;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    flex-shrink: 0;
-  }
-
-  .chat-panel-name {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    line-height: 1.2;
-  }
-
-  .chat-panel-status {
-    font-size: 0.67rem;
-    font-family: var(--font-mono);
-    color: var(--accent);
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-  }
-
-  .chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1.2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    scroll-behavior: smooth;
-  }
-
-  .chat-messages::-webkit-scrollbar { width: 3px; }
-  .chat-messages::-webkit-scrollbar-thumb { background: var(--accent-mid); border-radius: 3px; }
-
-  .chat-bubble {
-    background: white;
-    border-radius: 4px 14px 14px 14px;
-    padding: 0.85rem 1rem;
-    font-size: 0.865rem;
-    line-height: 1.68;
-    color: var(--text-primary);
-    border: 1px solid var(--border);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  }
-
-  .chat-bubble p + p { margin-top: 0.55rem; }
-
-  .chat-hint {
-    font-size: 0.78rem;
-    color: var(--text-tertiary);
-    padding: 0 0.25rem;
-    font-family: var(--font-mono);
-  }
-
-  .chat-nav-options {
-    padding: 0.75rem 1.2rem 1.2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    flex-shrink: 0;
-    border-top: 1px solid var(--border);
-    background: white;
-  }
-
-  .chat-nav-btn {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.65rem 0.9rem;
-    background: var(--surface);
-    border: 1px solid var(--border-mid);
-    border-radius: var(--radius-md);
-    font-family: var(--font-body);
-    font-size: 0.81rem;
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: var(--transition);
-    text-align: left;
-  }
-
-  .chat-nav-btn:hover {
-    background: var(--accent-light);
-    border-color: var(--border-accent);
-    color: var(--accent-dark);
-    transform: translateX(3px);
-  }
-
-  .chat-nav-btn.active-section {
-    background: var(--accent-light);
-    border-color: var(--accent);
-    color: var(--accent-dark);
-    font-weight: 500;
-  }
-
-  .btn-arrow {
-    font-size: 0.68rem;
-    color: var(--text-tertiary);
-    transition: var(--transition);
-  }
-
-  .chat-nav-btn:hover .btn-arrow,
-  .chat-nav-btn.active-section .btn-arrow { color: var(--accent); }
-
-  /* ── DIVIDER ── */
-  .divider {
-    width: 5px;
-    height: 100%;
-    background: var(--surface-raised);
-    cursor: col-resize;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s ease;
-    position: relative;
-    z-index: 5;
-  }
-
-  .divider:hover, .divider.dragging { background: var(--accent-mid); }
-
-  .divider-pip {
-    width: 3px;
-    height: 28px;
-    border-radius: 3px;
-    background: var(--text-tertiary);
-    opacity: 0.45;
-    transition: opacity 0.2s, background 0.2s;
-  }
-
-  .divider:hover .divider-pip,
-  .divider.dragging .divider-pip {
-    opacity: 1;
-    background: var(--accent-dark);
-  }
-
-  /* ── CONTENT PANEL ── */
-  .content-panel {
-    flex: 1;
-    height: 100%;
-    overflow-y: auto;
-    background: var(--bg);
-    min-width: 0;
-  }
-
-  .content-panel::-webkit-scrollbar { width: 4px; }
-  .content-panel::-webkit-scrollbar-thumb { background: var(--accent-mid); border-radius: 4px; }
-
-  .content-section {
-    display: none;
-    padding: 3.5rem 3rem;
-    min-height: 100%;
-    animation: fade-in 0.35s ease;
-  }
-
-  .content-section.active { display: block; }
-
-  .section-eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.67rem;
-    letter-spacing: 0.18em;
-    color: var(--accent);
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
-  }
-
-  .section-title {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 4vw, 3.2rem);
-    font-weight: 300;
-    line-height: 1.1;
-    margin-bottom: 2.5rem;
-    color: var(--text-primary);
-  }
-
-  .section-title em { font-style: italic; color: var(--accent); }
-
-  .placeholder-block {
-    border: 1.5px dashed var(--border-accent);
-    border-radius: var(--radius-xl);
-    background: var(--accent-light);
-    padding: 5rem 3rem;
-    text-align: center;
-  }
-
-  .placeholder-label {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: var(--accent);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
-  }
-
-  .placeholder-title {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    font-weight: 300;
-    color: var(--accent-dark);
-  }
-
-  /* empty state */
-  .content-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    min-height: 100vh;
-    text-align: center;
-    padding: 3rem;
-  }
-
-  .content-empty-title {
-    font-family: var(--font-display);
-    font-size: 2.5rem;
-    font-weight: 300;
-    color: var(--text-tertiary);
-    margin-bottom: 0.75rem;
-  }
-
-  .content-empty-sub {
-    font-size: 0.85rem;
-    color: var(--text-tertiary);
-    font-family: var(--font-mono);
-  }
-
-  /* ── ANIMATIONS ── */
-  @keyframes fade-up {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.45; transform: scale(0.7); }
-  }
-
-  /* ── MOBILE ── */
-  @media (max-width: 768px) {
-    .split-view { flex-direction: column; }
-    .chat-panel {
-      width: 100% !important;
-      height: 42vh;
-      min-width: unset;
-      max-width: unset;
-      border-right: none;
-      border-bottom: 1px solid var(--border-mid);
-    }
-    .divider { display: none; }
-    .content-panel { height: 58vh; }
-    .content-section { padding: 2rem 1.25rem; }
-    .content-empty { min-height: 58vh; }
-  }
-
-  /* ── TIMELINE ── */
-  .timeline-intro {
-    font-size: 0.93rem;
-    color: var(--text-secondary);
-    margin-bottom: 3rem;
-    font-style: italic;
-  }
-
-  .timeline-wrapper {
-    position: relative;
-    padding: 0 0 4rem 0;
-    perspective: 1200px;
-  }
-
-  .timeline-track {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: linear-gradient(to bottom, var(--accent) 0%, var(--accent-mid) 60%, transparent 100%);
-    transform: translateX(-50%);
-    z-index: 0;
-  }
-
-  /* era labels */
-  .era-label {
-    display: flex;
-    justify-content: center;
-    margin: 1.5rem 0 2rem;
-    position: relative;
-    z-index: 2;
-  }
-
-  .era-badge {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    padding: 0.3rem 0.9rem;
-    border-radius: 100px;
-    border: 1px solid;
-  }
-
-  .era-tech-badge {
-    background: var(--accent-light);
-    color: var(--accent-dark);
-    border-color: var(--border-accent);
-  }
-
-  .era-pre-badge {
-    background: #FDF6EC;
-    color: #92600A;
-    border-color: #F0C97A;
-  }
-
-  /* era divider */
-  .era-divider {
-    margin: 3rem 0;
-    position: relative;
-    z-index: 2;
-  }
-
-  .era-divider-inner {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .era-divider-line {
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(to right, transparent, #D4A843, transparent);
-  }
-
-  .era-divider-text {
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    font-style: italic;
-    color: #92600A;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  /* nodes */
-  .tl-node {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 2.5rem;
-    position: relative;
-    z-index: 2;
-    opacity: 0;
-    transform: translateY(20px) rotateX(8deg);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-
-  .tl-node.visible {
-    opacity: 1;
-    transform: translateY(0) rotateX(0deg);
-  }
-
-  .tl-node[data-side="right"] {
-    flex-direction: row;
-    padding-left: calc(50% + 24px);
-  }
-
-  .tl-node[data-side="left"] {
-    flex-direction: row-reverse;
-    padding-right: calc(50% + 24px);
-  }
-
-  /* dot */
-  .tl-dot {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: white;
-    border: 2px solid var(--accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3;
-    margin-top: 1rem;
-    box-shadow: 0 0 0 4px var(--accent-light);
-    transition: box-shadow 0.3s ease;
-    flex-shrink: 0;
-  }
-
-  .tl-dot-warm {
-    border-color: #D4A843;
-    box-shadow: 0 0 0 4px #FDF6EC;
-  }
-
-  .tl-node:hover .tl-dot {
-    box-shadow: 0 0 0 6px var(--accent-light), 0 0 16px rgba(42,157,143,0.3);
-  }
-
-  .tl-dot-inner {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--accent);
-  }
-
-  .tl-dot-warm .tl-dot-inner { background: #D4A843; }
-
-  /* connector line */
-  .tl-connector {
-    position: absolute;
-    top: 1.4rem;
-    height: 1px;
-    background: var(--accent-mid);
-    z-index: 1;
-    width: calc(50% - 36px);
-  }
-
-  .tl-node[data-side="right"] .tl-connector {
-    left: calc(50% + 7px);
-  }
-
-  .tl-node[data-side="left"] .tl-connector {
-    right: calc(50% + 7px);
-  }
-
-  .tl-node[data-era="pretech"] .tl-connector { background: #F0C97A; }
-
-  /* card */
-  .tl-card {
-    background: white;
-    border: 1px solid var(--border-mid);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.05);
-    width: calc(100% - 1rem);
-    max-width: 340px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    transform-style: preserve-3d;
-    overflow: hidden;
-  }
-
-  .tl-card:hover {
-    transform: translateY(-3px) rotateY(-1deg);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.11), 0 2px 8px rgba(0,0,0,0.06);
-  }
-
-  .tl-node[data-side="left"] .tl-card:hover {
-    transform: translateY(-3px) rotateY(1deg);
-  }
-
-  .tl-card-warm {
-    border-color: #F0C97A;
-    box-shadow: 0 4px 20px rgba(212,168,67,0.08), 0 1px 4px rgba(0,0,0,0.05);
-  }
-
-  .tl-card-front {
-    padding: 1.1rem 1.2rem 0.9rem;
-  }
-
-  .tl-card-dates {
-    font-family: var(--font-mono);
-    font-size: 0.66rem;
-    color: var(--text-tertiary);
-    letter-spacing: 0.06em;
-    margin-bottom: 0.3rem;
-  }
-
-  .tl-card-title {
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: 0.2rem;
-    line-height: 1.3;
-  }
-
-  .tl-card-company {
-    font-size: 0.8rem;
-    color: var(--accent);
-    font-family: var(--font-mono);
-    margin-bottom: 0.8rem;
-  }
-
-  .tl-card-warm .tl-card-company { color: #92600A; }
-
-  .tl-card-highlights {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .tl-highlight {
-    font-size: 0.79rem;
-    color: var(--text-secondary);
-    line-height: 1.4;
-    padding-left: 0.75rem;
-    position: relative;
-  }
-
-  .tl-highlight::before {
-    content: '·';
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-  }
-
-  .tl-card-warm .tl-highlight::before { color: #D4A843; }
-
-  .tl-more-btn {
-    width: 100%;
-    padding: 0.5rem;
-    background: var(--accent-light);
-    border: none;
-    border-top: 1px solid var(--border-accent);
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: var(--accent-dark);
-    cursor: pointer;
-    letter-spacing: 0.06em;
-    transition: background 0.2s;
-  }
-
-  .tl-more-btn:hover { background: var(--accent-mid); }
-  .tl-more-warm { background: #FDF6EC; border-color: #F0C97A; color: #92600A; }
-  .tl-more-warm:hover { background: #F5DFA0; }
-
-  /* expanded */
-  .tl-card-expanded {
-    display: none;
-    border-top: 1px solid var(--border);
-    background: var(--surface);
-    animation: fade-in 0.3s ease;
-  }
-
-  .tl-card-expanded.open { display: block; }
-
-  .tl-expand-body {
-    padding: 1rem 1.2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-  }
-
-  .tl-expand-body p {
-    font-size: 0.82rem;
-    line-height: 1.65;
-    color: var(--text-secondary);
-  }
-
-  .tl-collapse-btn {
-    width: 100%;
-    padding: 0.5rem;
-    background: var(--surface-raised);
-    border: none;
-    border-top: 1px solid var(--border);
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    cursor: pointer;
-    letter-spacing: 0.06em;
-    transition: background 0.2s;
-  }
-
-  .tl-collapse-btn:hover { background: var(--surface-raised); color: var(--text-primary); }
-
+:root {
+  --bg:        #F7F8FB;
+  --surface:   #EDF4F4;
+  --teal:      #289292;
+  --teal-soft: #73B1B6;
+  --teal-light:#E0F0F0;
+  --gold:      #B49857;
+  --terra:     #E18C47;
+  --terra-light:#FAF0E4;
+  --text:      #1A2A2A;
+  --text-mid:  #3A5A5A;
+  --text-soft: #6B8A8A;
+  --border:    rgba(40,146,146,0.15);
+  --border-mid:rgba(40,146,146,0.25);
+  --display:   'Playfair Display', Georgia, serif;
+  --body:      'Lora', Georgia, serif;
+  --mono:      'DM Mono', monospace;
+  --ease:      cubic-bezier(0.4,0,0.2,1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{height:100%;scroll-behavior:smooth;}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.7;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── CANVAS for WebGL particles ── */
+#glCanvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+}
+
+/* ── LANDING ── */
+.landing {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+  overflow: hidden;
+}
+
+.landing.exit {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.96) translateY(-20px);
+}
+
+/* ── BEACH SCENE ── */
+.beach-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.beach-scene svg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+}
+
+/* sun rays */
+.sun-ray {
+  animation: sun-pulse 4s ease-in-out infinite;
+  transform-origin: 72% 22%;
+}
+@keyframes sun-pulse {
+  0%,100%{opacity:0.6;transform:scale(1);}
+  50%{opacity:0.9;transform:scale(1.05);}
+}
+
+/* water shimmer */
+.water-shimmer {
+  animation: shimmer 3s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0%,100%{opacity:0.7;}
+  50%{opacity:1;}
+}
+
+/* palm sway */
+.palm {
+  animation: sway 5s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+@keyframes sway {
+  0%,100%{transform:rotate(-2deg);}
+  50%{transform:rotate(2deg);}
+}
+
+/* wave motion */
+.wave1 { animation: wave-move 6s ease-in-out infinite; }
+.wave2 { animation: wave-move 8s ease-in-out infinite reverse; }
+@keyframes wave-move {
+  0%,100%{transform:translateX(0);}
+  50%{transform:translateX(-20px);}
+}
+
+/* ── LANDING CONTENT ── */
+.landing-content {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  max-width: 580px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.landing-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  color: var(--teal);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  opacity: 0;
+  animation: fade-up 0.8s var(--ease) forwards 0.3s;
+  background: rgba(247,248,251,0.85);
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+}
+
+.landing-title {
+  font-family: var(--display);
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 700;
+  line-height: 1.0;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+  opacity: 0;
+  animation: fade-up 0.8s var(--ease) forwards 0.5s;
+  text-shadow: 0 2px 20px rgba(247,248,251,0.8);
+}
+
+.landing-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--teal);
+}
+
+.landing-tagline {
+  font-family: var(--body);
+  font-size: 1rem;
+  color: var(--text-mid);
+  font-style: italic;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fade-up 0.8s var(--ease) forwards 0.7s;
+  background: rgba(247,248,251,0.8);
+  padding: 0.3rem 0.6rem;
+  border-radius: 3px;
+}
+
+/* ── AUXIN CHAT WINDOW ── */
+.chat-window {
+  width: 100%;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 18px;
+  border: 1px solid var(--border-mid);
+  box-shadow: 0 12px 48px rgba(40,146,146,0.15), 0 2px 8px rgba(0,0,0,0.06);
+  overflow: hidden;
+  opacity: 0;
+  animation: fade-up 0.8s var(--ease) forwards 0.9s;
+  display: flex;
+  flex-direction: column;
+  max-height: 48vh;
+}
+
+.window-header {
+  padding: 0.9rem 1.2rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-shrink: 0;
+}
+
+.auxin-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--teal-soft));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(40,146,146,0.3);
+}
+
+.auxin-avatar svg { width: 14px; height: 14px; }
+
+.window-name {
+  font-family: var(--display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.window-status {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--teal);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.status-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--teal);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:0.4;transform:scale(0.7);}
+}
+
+.window-body {
+  padding: 1.2rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.window-body::-webkit-scrollbar{width:3px;}
+.window-body::-webkit-scrollbar-thumb{background:var(--teal-soft);border-radius:3px;}
+
+.window-message {
+  font-family: var(--body);
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+.auxin-cursor {
+  display: inline-block;
+  width: 2px; height: 0.88em;
+  background: var(--teal);
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: blink 0.9s step-end infinite;
+}
+
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+.window-options {
+  padding: 0 1.2rem 1.2rem;
+  display: none;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+.window-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border-mid);
+  border-radius: 10px;
+  font-family: var(--body);
+  font-size: 0.87rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.25s var(--ease);
+  text-align: left;
+}
+
+.window-btn:hover {
+  background: var(--teal-light);
+  border-color: var(--teal);
+  color: var(--teal);
+  transform: translateX(4px);
+}
+
+.window-btn-arrow {
+  font-size: 0.75rem;
+  color: var(--text-soft);
+  transition: all 0.25s var(--ease);
+}
+
+.window-btn:hover .window-btn-arrow { color: var(--teal); transform: translateX(3px); }
+
+/* ── SPLIT VIEW ── */
+.split-view {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.55s var(--ease);
+  z-index: 5;
+}
+
+.split-view.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Chat panel */
+.chat-panel {
+  width: 340px;
+  min-width: 260px;
+  max-width: 50vw;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: rgba(237,244,244,0.97);
+  backdrop-filter: blur(12px);
+  border-right: 1px solid var(--border-mid);
+  flex-shrink: 0;
+}
+
+.chat-panel-header {
+  padding: 1rem 1.2rem;
+  background: white;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-shrink: 0;
+}
+
+.chat-panel-name {
+  font-family: var(--display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.chat-panel-status {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--teal);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  scroll-behavior: smooth;
+}
+
+.chat-messages::-webkit-scrollbar{width:3px;}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--teal-soft);border-radius:3px;}
+
+.chat-bubble {
+  background: white;
+  border-radius: 4px 14px 14px 14px;
+  padding: 0.9rem 1rem;
+  font-family: var(--body);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 4px rgba(40,146,146,0.06);
+}
+
+.chat-bubble p + p { margin-top: 0.55rem; }
+
+.chat-hint {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--text-soft);
+  padding: 0 0.2rem;
+}
+
+.chat-nav-options {
+  padding: 0.75rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  background: white;
+}
+
+.chat-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.9rem;
+  background: var(--surface);
+  border: 1px solid var(--border-mid);
+  border-radius: 10px;
+  font-family: var(--body);
+  font-size: 0.82rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.25s var(--ease);
+  text-align: left;
+}
+
+.chat-nav-btn:hover {
+  background: var(--teal-light);
+  border-color: var(--teal);
+  color: var(--teal);
+  transform: translateX(3px);
+}
+
+.chat-nav-btn.active-section {
+  background: var(--teal-light);
+  border-color: var(--teal);
+  color: var(--teal);
+  font-weight: 500;
+}
+
+.btn-arrow {
+  font-size: 0.68rem;
+  color: var(--text-soft);
+  transition: all 0.25s var(--ease);
+}
+
+.chat-nav-btn:hover .btn-arrow,
+.chat-nav-btn.active-section .btn-arrow { color: var(--teal); }
+
+/* ── DIVIDER ── */
+.divider {
+  width: 5px;
+  height: 100%;
+  background: var(--border);
+  cursor: col-resize;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  position: relative;
+  z-index: 5;
+}
+
+.divider:hover, .divider.dragging { background: var(--teal-soft); }
+
+.divider-pip {
+  width: 3px; height: 28px;
+  border-radius: 3px;
+  background: var(--text-soft);
+  opacity: 0.4;
+  transition: all 0.2s;
+}
+
+.divider:hover .divider-pip,
+.divider.dragging .divider-pip { opacity: 1; background: var(--teal); }
+
+/* ── CONTENT PANEL ── */
+.content-panel {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  background: var(--bg);
+  min-width: 0;
+  position: relative;
+}
+
+.content-panel::-webkit-scrollbar{width:4px;}
+.content-panel::-webkit-scrollbar-thumb{background:var(--teal-soft);border-radius:4px;}
+
+.content-section {
+  display: none;
+  padding: 3.5rem 3rem;
+  min-height: 100%;
+  animation: fade-in 0.35s var(--ease);
+}
+
+.content-section.active { display: block; }
+
+.section-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.67rem;
+  letter-spacing: 0.18em;
+  color: var(--teal);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.section-title {
+  font-family: var(--display);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.section-title em { font-style: italic; font-weight: 400; color: var(--teal); }
+
+/* ── CONTENT EMPTY STATE ── */
+.content-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  padding: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.content-empty-scene {
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+}
+
+.content-empty-title {
+  font-family: var(--display);
+  font-size: 2.5rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--teal);
+  margin-bottom: 0.75rem;
+  position: relative;
+  z-index: 2;
+}
+
+.content-empty-sub {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text-soft);
+  letter-spacing: 0.1em;
+  position: relative;
+  z-index: 2;
+}
+
+/* placeholder blocks */
+.placeholder-block {
+  border: 1.5px dashed var(--border-mid);
+  border-radius: 18px;
+  background: var(--teal-light);
+  padding: 5rem 3rem;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.placeholder-label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--teal);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.placeholder-title {
+  font-family: var(--display);
+  font-size: 2rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--text-mid);
+}
+
+/* ── TIMELINE ── */
+.timeline-intro {
+  font-family: var(--body);
+  font-size: 0.95rem;
+  font-style: italic;
+  color: var(--text-soft);
+  margin-bottom: 3rem;
+  margin-top: 0.5rem;
+}
+
+.timeline-wrapper {
+  position: relative;
+  padding-bottom: 4rem;
+}
+
+.timeline-track {
+  position: absolute;
+  left: 50%;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--teal) 0%, var(--teal-soft) 60%, transparent 100%);
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+.era-label {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.era-badge {
+  font-family: var(--mono);
+  font-size: 0.67rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.9rem;
+  border-radius: 100px;
+  border: 1px solid;
+}
+
+.era-tech-badge {
+  background: var(--teal-light);
+  color: var(--teal);
+  border-color: var(--border-mid);
+}
+
+.era-pre-badge {
+  background: var(--terra-light);
+  color: #A0521A;
+  border-color: rgba(225,140,71,0.4);
+}
+
+.era-divider {
+  margin: 3rem 0;
+  position: relative;
+  z-index: 2;
+}
+
+.era-divider-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.era-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--terra), transparent);
+}
+
+.era-divider-text {
+  font-family: var(--display);
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--terra);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* nodes */
+.tl-node {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 2;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+
+.tl-node.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tl-node[data-side="right"] {
+  flex-direction: row;
+  padding-left: calc(50% + 24px);
+}
+
+.tl-node[data-side="left"] {
+  flex-direction: row-reverse;
+  padding-right: calc(50% + 24px);
+}
+
+.tl-dot {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid var(--teal);
+  z-index: 3;
+  margin-top: 0.9rem;
+  box-shadow: 0 0 0 4px var(--teal-light), 0 0 16px rgba(40,146,146,0.2);
+  transition: box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tl-dot-warm {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 4px var(--terra-light), 0 0 16px rgba(225,140,71,0.2);
+}
+
+.tl-node:hover .tl-dot {
+  transform: translateX(-50%) scale(1.2);
+  box-shadow: 0 0 0 6px var(--teal-light), 0 0 24px rgba(40,146,146,0.35);
+}
+
+.tl-node:hover .tl-dot-warm {
+  box-shadow: 0 0 0 6px var(--terra-light), 0 0 24px rgba(225,140,71,0.35);
+}
+
+.tl-dot-inner {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--teal);
+}
+
+.tl-dot-warm .tl-dot-inner { background: var(--terra); }
+
+.tl-connector {
+  position: absolute;
+  top: 1.3rem;
+  height: 1px;
+  background: linear-gradient(to right, var(--teal-soft), transparent);
+  z-index: 1;
+  width: calc(50% - 36px);
+}
+
+.tl-node[data-side="right"] .tl-connector { left: calc(50% + 8px); }
+.tl-node[data-side="left"] .tl-connector {
+  right: calc(50% + 8px);
+  background: linear-gradient(to left, var(--teal-soft), transparent);
+}
+
+.tl-node[data-era="pretech"] .tl-connector { background: linear-gradient(to right, rgba(225,140,71,0.5), transparent); }
+.tl-node[data-era="pretech"][data-side="left"] .tl-connector { background: linear-gradient(to left, rgba(225,140,71,0.5), transparent); }
+
+/* card */
+.tl-card {
+  background: white;
+  border: 1px solid var(--border-mid);
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(40,146,146,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  width: calc(100% - 0.5rem);
+  max-width: 320px;
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+  overflow: hidden;
+  will-change: transform;
+}
+
+.tl-card:hover {
+  transform: translateY(-4px) perspective(600px) rotateY(-2deg);
+  box-shadow: 0 12px 40px rgba(40,146,146,0.15), 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.tl-node[data-side="left"] .tl-card:hover {
+  transform: translateY(-4px) perspective(600px) rotateY(2deg);
+}
+
+.tl-card-warm {
+  border-color: rgba(225,140,71,0.3);
+  box-shadow: 0 4px 24px rgba(225,140,71,0.08), 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.tl-card-warm:hover {
+  box-shadow: 0 12px 40px rgba(225,140,71,0.15), 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.tl-card-front { padding: 1.1rem 1.1rem 0.85rem; }
+
+.tl-card-dates {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  color: var(--text-soft);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.3rem;
+}
+
+.tl-card-title {
+  font-family: var(--display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.2rem;
+  line-height: 1.3;
+}
+
+.tl-card-company {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--teal);
+  margin-bottom: 0.75rem;
+}
+
+.tl-card-warm .tl-card-company { color: var(--terra); }
+
+.tl-card-highlights {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  margin-bottom: 0.75rem;
+}
+
+.tl-highlight {
+  font-family: var(--body);
+  font-size: 0.78rem;
+  color: var(--text-mid);
+  line-height: 1.45;
+  padding-left: 0.8rem;
+  position: relative;
+}
+
+.tl-highlight::before {
+  content: "·";
+  position: absolute;
+  left: 0;
+  color: var(--teal);
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.tl-card-warm .tl-highlight::before { color: var(--terra); }
+
+.tl-more-btn {
+  width: 100%;
+  padding: 0.5rem;
+  background: var(--teal-light);
+  border: none;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--teal);
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition: background 0.2s, color 0.2s;
+}
+
+.tl-more-btn:hover { background: var(--teal-soft); color: white; }
+
+.tl-more-warm {
+  background: var(--terra-light);
+  color: var(--terra);
+  border-top-color: rgba(225,140,71,0.2);
+}
+
+.tl-more-warm:hover { background: var(--terra); color: white; }
+
+.tl-card-expanded {
+  display: none;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  animation: fade-in 0.3s var(--ease);
+}
+
+.tl-card-expanded.open { display: block; }
+
+.tl-expand-body {
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.tl-expand-body p {
+  font-family: var(--body);
+  font-size: 0.81rem;
+  line-height: 1.7;
+  color: var(--text-mid);
+}
+
+.tl-collapse-btn {
+  width: 100%;
+  padding: 0.5rem;
+  background: var(--surface);
+  border: none;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--text-soft);
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition: background 0.2s;
+}
+
+.tl-collapse-btn:hover { background: var(--border); color: var(--text); }
+
+/* ── CURSOR GLOW ── */
+.cursor-glow {
+  position: fixed;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(40,146,146,0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s;
+  mix-blend-mode: multiply;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fade-up {
+  from{opacity:0;transform:translateY(16px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+@keyframes fade-in {
+  from{opacity:0;}
+  to{opacity:1;}
+}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  .split-view{flex-direction:column;}
+  .chat-panel{width:100%!important;height:42vh;min-width:unset;max-width:unset;border-right:none;border-bottom:1px solid var(--border-mid);}
+  .divider{display:none;}
+  .content-panel{height:58vh;}
+  .content-section{padding:2rem 1.25rem;}
+  .content-empty{min-height:58vh;}
+  .tl-node[data-side="right"]{padding-left:calc(50% + 16px);}
+  .tl-node[data-side="left"]{padding-right:calc(50% + 16px);}
+  .tl-card{max-width:calc(50vw - 40px);}
+}
 </style>
 </head>
 <body>
 
+<!-- cursor glow -->
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- WebGL particle canvas -->
+<canvas id="glCanvas"></canvas>
+
 <!-- ══ LANDING ══ -->
 <div class="landing" id="landing">
-  <div class="landing-bg">
-    <svg viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid slice" fill="none">
-      <path d="M-200 450 Q350 180 700 450 Q1050 720 1600 450" stroke="#2A9D8F" stroke-width="1.5"/>
-      <path d="M-200 500 Q350 230 700 500 Q1050 770 1600 500" stroke="#2A9D8F" stroke-width="1"/>
-      <path d="M-200 400 Q350 130 700 400 Q1050 670 1600 400" stroke="#2A9D8F" stroke-width="1"/>
-      <path d="M-200 550 Q350 280 700 550 Q1050 820 1600 550" stroke="#2A9D8F" stroke-width="0.6"/>
-      <path d="M-200 350 Q350 80 700 350 Q1050 620 1600 350" stroke="#2A9D8F" stroke-width="0.6"/>
-      <circle cx="700" cy="450" r="220" stroke="#2A9D8F" stroke-width="0.5"/>
-      <circle cx="700" cy="450" r="390" stroke="#2A9D8F" stroke-width="0.5"/>
-      <circle cx="700" cy="450" r="580" stroke="#2A9D8F" stroke-width="0.5"/>
+
+  <!-- BEACH ILLUSTRATION -->
+  <div class="beach-scene">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <!-- Sky gradient -->
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#B8DFF0"/>
+          <stop offset="60%" stop-color="#D4EEF7"/>
+          <stop offset="100%" stop-color="#E8F6FA"/>
+        </linearGradient>
+        <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#289292" stop-opacity="0.7"/>
+          <stop offset="50%" stop-color="#73B1B6" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#A8D8D8" stop-opacity="0.5"/>
+        </linearGradient>
+        <linearGradient id="sand" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#E8D5A3"/>
+          <stop offset="100%" stop-color="#D4B87A"/>
+        </linearGradient>
+        <radialGradient id="sun" cx="72%" cy="22%" r="12%">
+          <stop offset="0%" stop-color="#FFE8A0" stop-opacity="1"/>
+          <stop offset="40%" stop-color="#FFD060" stop-opacity="0.8"/>
+          <stop offset="100%" stop-color="#FFB830" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="blur-sm">
+          <feGaussianBlur stdDeviation="2"/>
+        </filter>
+        <filter id="blur-md">
+          <feGaussianBlur stdDeviation="4"/>
+        </filter>
+      </defs>
+
+      <!-- Sky -->
+      <rect width="1440" height="900" fill="url(#sky)"/>
+
+      <!-- Sun glow -->
+      <circle cx="1037" cy="198" r="120" fill="url(#sun)" class="sun-ray"/>
+      <circle cx="1037" cy="198" r="50" fill="#FFE8A0" opacity="0.9"/>
+      <circle cx="1037" cy="198" r="30" fill="#FFF5CC"/>
+
+      <!-- Distant land/horizon -->
+      <path d="M0 420 Q200 390 400 410 Q600 430 800 400 Q1000 370 1200 390 Q1350 405 1440 395 L1440 460 L0 460Z" fill="#C8D8B0" opacity="0.5"/>
+      <path d="M0 445 Q300 425 600 440 Q900 455 1200 435 Q1350 425 1440 430 L1440 470 L0 470Z" fill="#B8C89A" opacity="0.4"/>
+
+      <!-- Water body -->
+      <path d="M0 480 Q180 465 360 475 Q540 485 720 470 Q900 455 1080 468 Q1260 481 1440 470 L1440 780 L0 780Z" fill="url(#water)" class="water-shimmer"/>
+
+      <!-- Water shimmer streaks -->
+      <path d="M100 510 Q300 505 500 512" stroke="white" stroke-width="1.5" fill="none" opacity="0.3" class="wave1"/>
+      <path d="M200 530 Q400 524 650 532" stroke="white" stroke-width="1" fill="none" opacity="0.25" class="wave2"/>
+      <path d="M50 550 Q250 544 450 551" stroke="white" stroke-width="1" fill="none" opacity="0.2" class="wave1"/>
+      <path d="M800 515 Q1000 509 1200 516" stroke="white" stroke-width="1.5" fill="none" opacity="0.3" class="wave2"/>
+      <path d="M700 540 Q900 534 1100 541" stroke="white" stroke-width="1" fill="none" opacity="0.2" class="wave1"/>
+
+      <!-- Sand beach -->
+      <path d="M0 740 Q200 720 400 730 Q600 740 800 725 Q1000 710 1200 720 Q1350 728 1440 715 L1440 900 L0 900Z" fill="url(#sand)"/>
+
+      <!-- Sand texture waves -->
+      <path d="M0 760 Q300 752 600 758 Q900 764 1200 756 Q1350 752 1440 754" stroke="#D4B87A" stroke-width="1" fill="none" opacity="0.5"/>
+      <path d="M0 775 Q250 768 500 773 Q750 778 1000 771 Q1250 764 1440 768" stroke="#D4B87A" stroke-width="0.5" fill="none" opacity="0.4"/>
+
+      <!-- Small building / bottega on the left shore -->
+      <!-- Structure -->
+      <rect x="120" y="680" width="80" height="55" fill="#E8DCC8" rx="2"/>
+      <!-- Roof -->
+      <path d="M108 680 L160 650 L212 680Z" fill="#C8906A"/>
+      <!-- Door -->
+      <rect x="148" y="710" width="22" height="25" fill="#8B6040" rx="2"/>
+      <!-- Windows -->
+      <rect x="126" y="693" width="16" height="12" fill="#B8DFF0" rx="1" opacity="0.8"/>
+      <rect x="174" y="693" width="16" height="12" fill="#B8DFF0" rx="1" opacity="0.8"/>
+      <!-- Window warm glow -->
+      <rect x="127" y="694" width="14" height="10" fill="#FFE4A0" rx="1" opacity="0.6"/>
+      <rect x="175" y="694" width="14" height="10" fill="#FFE4A0" rx="1" opacity="0.6"/>
+      <!-- Sign -->
+      <rect x="135" y="666" width="50" height="12" fill="#8B6040" rx="2"/>
+      <text x="160" y="676" text-anchor="middle" font-size="6" fill="#FFE8A0" font-family="Georgia, serif" font-style="italic">Bottega</text>
+      <!-- Small dock/pier -->
+      <rect x="190" y="728" width="60" height="4" fill="#A0784A" opacity="0.8"/>
+      <rect x="193" y="732" width="3" height="12" fill="#8B6040" opacity="0.8"/>
+      <rect x="243" y="732" width="3" height="12" fill="#8B6040" opacity="0.8"/>
+
+      <!-- Palm tree left -->
+      <g class="palm" style="transform-origin:180px 740px">
+        <rect x="178" y="650" width="5" height="90" fill="#8B7355" rx="2"/>
+        <path d="M180 652 Q160 620 130 618 Q150 635 155 652Z" fill="#5A8A3A"/>
+        <path d="M180 652 Q200 615 230 616 Q210 635 205 652Z" fill="#4A7A2A"/>
+        <path d="M180 652 Q155 640 140 655 Q158 650 165 662Z" fill="#6A9A4A"/>
+        <path d="M180 652 Q205 640 220 655 Q202 650 195 662Z" fill="#5A8A3A"/>
+        <path d="M180 652 Q170 625 160 622 Q168 638 170 652Z" fill="#4A7A2A"/>
+      </g>
+
+      <!-- Palm tree right -->
+      <g class="palm" style="transform-origin:1280px 760px;animation-delay:-2.5s">
+        <rect x="1278" y="665" width="5" height="95" fill="#8B7355" rx="2"/>
+        <path d="M1280 667 Q1258 632 1226 630 Q1248 648 1253 667Z" fill="#5A8A3A"/>
+        <path d="M1280 667 Q1302 628 1334 629 Q1312 648 1307 667Z" fill="#4A7A2A"/>
+        <path d="M1280 667 Q1252 654 1236 670 Q1256 664 1264 676Z" fill="#6A9A4A"/>
+        <path d="M1280 667 Q1308 654 1324 670 Q1304 664 1296 676Z" fill="#5A8A3A"/>
+      </g>
+
+      <!-- Sailboat on water -->
+      <g style="transform:translateX(0px)">
+        <!-- Hull -->
+        <path d="M960 560 Q990 575 1020 560 L1015 572 Q990 580 965 572Z" fill="#F5F0E0"/>
+        <path d="M965 572 Q990 582 1015 572 L1020 560 Q990 575 960 560Z" fill="#E0D8C0"/>
+        <!-- Mast -->
+        <rect x="989" y="520" width="2" height="52" fill="#8B7355"/>
+        <!-- Sail -->
+        <path d="M991 522 Q1005 530 1010 548 L991 550Z" fill="white" opacity="0.9"/>
+        <path d="M990 522 Q976 530 971 548 L990 550Z" fill="#F5F0E8" opacity="0.85"/>
+      </g>
+
+      <!-- Distant boat -->
+      <g opacity="0.5">
+        <path d="M600 490 Q615 496 630 490 L628 496 Q615 500 602 496Z" fill="#E8E0CC"/>
+        <rect x="614" y="478" width="1.5" height="18" fill="#8B7355"/>
+        <path d="M615.5 479 Q622 483 624 490 L615.5 491Z" fill="white" opacity="0.8"/>
+      </g>
+
+      <!-- Seagulls -->
+      <path d="M400 350 Q405 345 410 350" stroke="#6B8A8A" stroke-width="1.5" fill="none"/>
+      <path d="M415 360 Q421 354 427 360" stroke="#6B8A8A" stroke-width="1.5" fill="none"/>
+      <path d="M800 310 Q806 304 812 310" stroke="#6B8A8A" stroke-width="1.5" fill="none"/>
+      <path d="M820 325 Q825 320 830 325" stroke="#6B8A8A" stroke-width="1.2" fill="none"/>
+
+      <!-- Foreground beach details -->
+      <!-- Umbrella -->
+      <path d="M350 745 Q380 720 410 745Z" fill="#E18C47" opacity="0.85"/>
+      <path d="M360 745 Q380 724 400 745Z" fill="#289292" opacity="0.75"/>
+      <rect x="379" y="745" width="2" height="20" fill="#8B6040"/>
+
+      <!-- subtle vignette -->
+      <radialGradient id="vign" cx="50%" cy="50%" r="70%">
+        <stop offset="0%" stop-color="transparent"/>
+        <stop offset="100%" stop-color="rgba(26,42,42,0.25)"/>
+      </radialGradient>
+      <rect width="1440" height="900" fill="url(#vign)"/>
     </svg>
   </div>
 
@@ -889,7 +1105,7 @@
     <div class="chat-window" id="landingChat">
       <div class="window-header">
         <div class="auxin-avatar">
-          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="white" fill-opacity="0.25"/><path d="M8 12l2.5 2.5L16 9" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="white" fill-opacity="0.2"/><path d="M8 12l2.5 2.5L16 9" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <div>
           <div class="window-name">Auxin</div>
@@ -914,20 +1130,17 @@
 <!-- ══ SPLIT VIEW ══ -->
 <div class="split-view" id="splitView">
 
-  <!-- CHAT PANEL -->
   <div class="chat-panel" id="chatPanel">
     <div class="chat-panel-header">
       <div class="auxin-avatar">
-        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="white" fill-opacity="0.25"/><path d="M8 12l2.5 2.5L16 9" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="white" fill-opacity="0.2"/><path d="M8 12l2.5 2.5L16 9" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
       <div>
         <div class="chat-panel-name">Auxin</div>
         <div class="chat-panel-status"><span class="status-dot"></span>Austin's Bottega</div>
       </div>
     </div>
-
     <div class="chat-messages" id="chatMessages"></div>
-
     <div class="chat-nav-options">
       <button class="chat-nav-btn" id="btn-work" onclick="showSection('work')">📈 Work History <span class="btn-arrow">→</span></button>
       <button class="chat-nav-btn" id="btn-certs" onclick="showSection('certs')">🏆 Certifications <span class="btn-arrow">→</span></button>
@@ -936,319 +1149,34 @@
     </div>
   </div>
 
-  <!-- DRAGGABLE DIVIDER -->
-  <div class="divider" id="divider">
-    <div class="divider-pip"></div>
-  </div>
+  <div class="divider" id="divider"><div class="divider-pip"></div></div>
 
-  <!-- CONTENT PANEL -->
   <div class="content-panel" id="contentPanel">
-
     <div class="content-empty" id="contentEmpty">
+      <div class="content-empty-scene">
+        <svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <rect width="800" height="600" fill="#B8DFF0" opacity="0.3"/>
+          <path d="M0 350 Q200 320 400 340 Q600 360 800 330 L800 600 L0 600Z" fill="#289292" opacity="0.15"/>
+          <path d="M0 420 Q200 400 400 415 Q600 430 800 410 L800 600 L0 600Z" fill="#73B1B6" opacity="0.1"/>
+        </svg>
+      </div>
       <div class="content-empty-title">Choose a section</div>
       <div class="content-empty-sub">← select from Auxin's menu</div>
     </div>
 
+    <!-- WORK HISTORY -->
     <div class="content-section" id="section-work">
       <div class="section-eyebrow">Chapter 02</div>
       <h2 class="section-title">Work <em>History</em></h2>
       <p class="timeline-intro">From the beaches of St. Pete to enterprise AI — every stop on the arc.</p>
-      <div class="timeline-wrapper">
+      <div class="timeline-wrapper" id="timelineWrapper">
         <div class="timeline-track"></div>
         <div class="era-label"><span class="era-badge era-tech-badge">Tech Era</span></div>
-        
-        <div class="tl-node" data-side="right" data-era="tech">
-          <div class="tl-connector"></div>
-          <div class="tl-dot"><div class="tl-dot-inner"></div></div>
-          <div class="tl-card" id="card-ais">
-            <div class="tl-card-front">
-              <div class="tl-card-dates">March 2025 – Present</div>
-              <div class="tl-card-title">Head of Growth Strategy</div>
-              <div class="tl-card-company">AI Squared</div>
-              <div class="tl-card-highlights"><div class="tl-highlight">Leading mid-market GTM — pipeline, acquisition, revenue</div>
-<div class="tl-highlight">Building & leading BDRs and Account Executives</div>
-<div class="tl-highlight">Shipping Claude-powered tools and AI workflows for clients</div></div>
-              <button class="tl-more-btn" onclick="expandCard('ais')">More ↓</button>
-            </div>
-            <div class="tl-card-expanded" id="expand-ais">
-              <div class="tl-expand-body"><p>At AI Squared, Austin operates at the rare intersection of sales leadership and hands-on AI implementation. He spearheads the mid-market GTM plan — building pipeline, driving acquisition, and owning revenue across verticals including finance, healthcare, and manufacturing.</p>
-<p>He recruits, trains, and leads BDRs and Account Executives, implementing KPIs and conversion processes while serving as the primary escalation point for enterprise clients. On the AI side, he leverages 19 certifications earned in 2026 to build and deploy custom Claude-powered workflows, automation tools, and prototypes — including Data Scientist in a Box, DataMatch, and Notes to Quote.</p>
-<p>He identified and personally scoped all Sparx use cases, built the prototypes, and handled concept, messaging, branding, and positioning end-to-end. AI Squared's UNIFI platform is trusted by the U.S. DoD, Coca-Cola, Vanguard, and Nationwide.</p></div>
-              <button class="tl-collapse-btn" onclick="collapseCard('ais')">Close ↑</button>
-            </div>
-          </div>
-        </div>
-        <div class="tl-node" data-side="left" data-era="tech">
-          <div class="tl-connector"></div>
-          <div class="tl-dot"><div class="tl-dot-inner"></div></div>
-          <div class="tl-card" id="card-consult">
-            <div class="tl-card-front">
-              <div class="tl-card-dates">December 2025 – Present</div>
-              <div class="tl-card-title">Independent AI Consultant</div>
-              <div class="tl-card-company">Freelance</div>
-              <div class="tl-card-highlights"><div class="tl-highlight">Claude-powered tools and workflows for SMB clients</div>
-<div class="tl-highlight">Rapid prototyping, prompt engineering, deployment</div>
-<div class="tl-highlight">Clients across home services, watersports, fabrication</div></div>
-              <button class="tl-more-btn" onclick="expandCard('consult')">More ↓</button>
-            </div>
-            <div class="tl-card-expanded" id="expand-consult">
-              <div class="tl-expand-body"><p>Running a parallel independent practice, Austin builds and deploys AI-powered tools for small and mid-sized businesses. Services include AI use case scoping, workflow design, prompt engineering, rapid prototyping, and client-facing tool deployment.</p>
-<p>Every engagement starts with discovery to identify high-value automation opportunities, then moves into build — typically Claude-powered custom tools delivered as standalone apps or embedded workflows.</p></div>
-              <button class="tl-collapse-btn" onclick="collapseCard('consult')">Close ↑</button>
-            </div>
-          </div>
-        </div>
-        <div class="tl-node" data-side="right" data-era="tech">
-          <div class="tl-connector"></div>
-          <div class="tl-dot"><div class="tl-dot-inner"></div></div>
-          <div class="tl-card" id="card-anydesk">
-            <div class="tl-card-front">
-              <div class="tl-card-dates">May 2023 – March 2025</div>
-              <div class="tl-card-title">Director of Go-To-Market</div>
-              <div class="tl-card-company">AnyDesk</div>
-              <div class="tl-card-highlights"><div class="tl-highlight">31% NRR increase in 9 months via retention team build-out</div>
-<div class="tl-highlight">Scaled team to 17 with global + regional manager layers</div>
-<div class="tl-highlight">Rebuilt customer lifecycle, playbooks, and sales ops</div></div>
-              <button class="tl-more-btn" onclick="expandCard('anydesk')">More ↓</button>
-            </div>
-            <div class="tl-card-expanded" id="expand-anydesk">
-              <div class="tl-expand-body"><p>AnyDesk had 200,000 customers across 190 countries but was struggling with churn, revenue leakage, and a lack of scalable growth infrastructure. Austin came in to fix it.</p>
-<p>He built a dedicated retention team from scratch — achieving a 31% increase in NRR within 9 months, scaling to 17 members with global and regional manager layers. He developed sales playbooks, objection-tracking frameworks, and a commercial terms dictionary. He redesigned the end-to-end customer lifecycle, ran cohort analysis to build targeted campaigns, and supported a full sales org restructuring during a leadership transition.</p></div>
-              <button class="tl-collapse-btn" onclick="collapseCard('anydesk')">Close ↑</button>
-            </div>
-          </div>
-        </div>
-        <div class="tl-node" data-side="left" data-era="tech">
-          <div class="tl-connector"></div>
-          <div class="tl-dot"><div class="tl-dot-inner"></div></div>
-          <div class="tl-card" id="card-chainstack">
-            <div class="tl-card-front">
-              <div class="tl-card-dates">December 2021 – May 2023</div>
-              <div class="tl-card-title">Head of Growth & Sales</div>
-              <div class="tl-card-company">Chainstack</div>
-              <div class="tl-card-highlights"><div class="tl-highlight">Scaled org from 8 → 120 people in de facto CEO capacity</div>
-<div class="tl-highlight">Built sales, CS, partnerships, devrel & marketing teams</div>
-<div class="tl-highlight">500% ARR growth in 2022 across DeFi, Gaming, NFTs</div></div>
-              <button class="tl-more-btn" onclick="expandCard('chainstack')">More ↓</button>
-            </div>
-            <div class="tl-card-expanded" id="expand-chainstack">
-              <div class="tl-expand-body"><p>During a CEO transition, Austin stepped in and ran Chainstack's entire commercial operation — sales, customer success, marketing, demand generation, developer relations, and partnerships. He owned the company sales goal outright.</p>
-<p>He built every team from the ground up: Account Executives, Developer Relations reps, a Customer Success function, a Partnerships team, and eventually a Marketing Director. He created a partner marketplace and affiliate program, secured cloud partnerships with AWS, GCP, Azure, and Virtuozzo, and represented Chainstack at global events across multiple countries.</p>
-<p>The result: 500% ARR growth in 2022 — but more importantly, a full commercial infrastructure that could sustain growth well beyond that initial spike.</p></div>
-              <button class="tl-collapse-btn" onclick="collapseCard('chainstack')">Close ↑</button>
-            </div>
-          </div>
-        </div>
-        <div class="tl-node" data-side="right" data-era="tech">
-          <div class="tl-connector"></div>
-          <div class="tl-dot"><div class="tl-dot-inner"></div></div>
-          <div class="tl-card" id="card-slash">
-            <div class="tl-card-front">
-              <div class="tl-card-dates">March 2021 – December 2021</div>
-              <div class="tl-card-title">Director of Sales</div>
-              <div class="tl-card-company">SlashNext</div>
-              <div class="tl-card-highlights"><div class="tl-highlight">Promoted from Sales Manager to Director in 5 months</div>
-<div class="tl-highlight">Led regional sales team across enterprise accounts</div>
-<div class="tl-highlight">AI-powered anti-phishing security, Silicon Valley HQ</div></div>
-              <button class="tl-more-btn" onclick="expandCard('slash')">More ↓</button>
-            </div>
-            <div class="tl-card-expanded" id="expand-slash">
-              <div class="tl-expand-body"><p>Austin joined SlashNext as a Sales Manager in March 2021 and was promoted to Director of Sales within 5 months — a reflection of both immediate impact and the leadership trajectory he tends to follow at every company.</p>
-<p>SlashNext is a Silicon Valley-based cybersecurity company with patented AI-powered anti-phishing technology — protecting employees, brands, and networks from phishing across browsers, endpoints, and social media with a 99.07% detection rate. Austin built and led the regional sales team, driving new business across enterprise and mid-market accounts.</p></div>
-              <button class="tl-collapse-btn" onclick="collapseCard('slash')">Close ↑</button>
-            </div>
-          </div>
-        </div>
-        <div class="tl-node" data-side="left" data-era="tech">
-          <div class="tl-connector"></div>
-          <div class="tl-dot"><div class="tl-dot-inner"></div></div>
-          <div class="tl-card" id="card-spin">
-            <div class="tl-card-front">
-              <div class="tl-card-dates">March 2020 – March 2021</div>
-              <div class="tl-card-title">Sales Manager</div>
-              <div class="tl-card-company">Spin Technology</div>
-              <div class="tl-card-highlights"><div class="tl-highlight">Cloud data protection for Google Workspace & M365</div>
-<div class="tl-highlight">AI-powered 24/7 threat detection and monitoring</div>
-<div class="tl-highlight">Drove new enterprise business across key accounts</div></div>
-              <button class="tl-more-btn" onclick="expandCard('spin')">More ↓</button>
-            </div>
-            <div class="tl-card-expanded" id="expand-spin">
-              <div class="tl-expand-body"><p>At Spin Technology, Austin led sales for a Palo Alto-based cloud data protection platform — securing Google Workspace and Microsoft 365 environments against ransomware, human error, and insider threats.</p>
-<p>The platform used AI for 24/7 monitoring, automated threat detection, and countermeasures. He drove new enterprise business and managed key accounts across a one-year tenure before moving to SlashNext.</p></div>
-              <button class="tl-collapse-btn" onclick="collapseCard('spin')">Close ↑</button>
-            </div>
-          </div>
-        </div>
-        <div class="tl-node" data-side="right" data-era="tech">
-          <div class="tl-connector"></div>
-          <div class="tl-dot"><div class="tl-dot-inner"></div></div>
-          <div class="tl-card" id="card-live">
-            <div class="tl-card-front">
-              <div class="tl-card-dates">January 2017 – December 2019</div>
-              <div class="tl-card-title">Sales Manager</div>
-              <div class="tl-card-company">LiveAction</div>
-              <div class="tl-card-highlights"><div class="tl-highlight">Where the tech career began — mentored by the CEO</div>
-<div class="tl-highlight">Rose through CS → Global Account Mgmt → Sales Manager</div>
-<div class="tl-highlight">Network performance management for Cisco environments</div></div>
-              <button class="tl-more-btn" onclick="expandCard('live')">More ↓</button>
-            </div>
-            <div class="tl-card-expanded" id="expand-live">
-              <div class="tl-expand-body"><p>LiveAction is where it all started. In late 2016, Austin met LiveAction's CEO — his mentor — and made the pivot into tech. He joined as a Customer Success Manager and spent three years growing through the organization: Customer Success Manager → Manager of Global Account Management → Sales Manager.</p>
-<p>Each step built on the last. Customer success gave him deep product and client knowledge. Global account management gave him enterprise relationship skills. Sales management gave him the repeatable playbook he'd carry into every role that followed.</p></div>
-              <button class="tl-collapse-btn" onclick="collapseCard('live')">Close ↑</button>
-            </div>
-          </div>
-        </div>
-        <div class="era-divider">
-          <div class="era-divider-inner">
-            <div class="era-divider-line"></div>
-            <div class="era-divider-text">2016 — The Pivot</div>
-            <div class="era-divider-line"></div>
-          </div>
-        </div>
-        <div class="era-label"><span class="era-badge era-pre-badge">Pre-Tech Era</span></div>
-        <div class="tl-node" data-side="left" data-era="pretech">
-          <div class="tl-connector"></div>
-          <div class="tl-dot tl-dot-warm"><div class="tl-dot-inner"></div></div>
-          <div class="tl-card tl-card-warm" id="card-symphony">
-            <div class="tl-card-front">
-              <div class="tl-card-dates">August 2015 – December 2016</div>
-              <div class="tl-card-title">Strategic Marketing Director</div>
-              <div class="tl-card-company">The Symphony Agency (now Allegrow)</div>
-              <div class="tl-card-highlights"><div class="tl-highlight">First corporate role after years of entrepreneurship</div>
-<div class="tl-highlight">Led client strategy, account management, marketing plans</div>
-<div class="tl-highlight">Bridge between the entrepreneurial chapter and tech</div></div>
-              <button class="tl-more-btn tl-more-warm" onclick="expandCard('symphony')">More ↓</button>
-            </div>
-            <div class="tl-card-expanded" id="expand-symphony">
-              <div class="tl-expand-body"><p>After years of running his own ventures, Austin joined The Symphony Agency as Strategic Marketing Director — his first corporate role. He led client communication, account management, and strategic marketing plan development.</p>
-<p>The agency later rebranded to Allegrow. This role served as the bridge between his entrepreneurial chapter and his tech career — developing the strategic and client management skills he'd carry into B2B SaaS.</p></div>
-              <button class="tl-collapse-btn" onclick="collapseCard('symphony')">Close ↑</button>
-            </div>
-          </div>
-        </div>
-        <div class="tl-node" data-side="right" data-era="pretech">
-          <div class="tl-connector"></div>
-          <div class="tl-dot tl-dot-warm"><div class="tl-dot-inner"></div></div>
-          <div class="tl-card tl-card-warm" id="card-spb">
-            <div class="tl-card-front">
-              <div class="tl-card-dates">2013 – 2017 · Exited 2025</div>
-              <div class="tl-card-title">Founder & Owner</div>
-              <div class="tl-card-company">St. Pete Beach LLC (SPB)</div>
-              <div class="tl-card-highlights"><div class="tl-highlight">Built from a single Facebook page to a media business</div>
-<div class="tl-highlight">Millions of monthly views · advertising, journalism, tourism</div>
-<div class="tl-highlight">The city tried to shut it down. He sent them their own letter.</div></div>
-              <button class="tl-more-btn tl-more-warm" onclick="expandCard('spb')">More ↓</button>
-            </div>
-            <div class="tl-card-expanded" id="expand-spb">
-              <div class="tl-expand-body"><p>What started as a Facebook page for St. Pete Beach grew into a full media business. When Austin launched it, the city sent him a formal letter stating they didn't want the page and never would — so he kept it. For years it pulled millions of views per month.</p>
-<p>SPB was spun out of Socialutions as the page outgrew its origins. The business expanded into advertising sales, journalism, and tourism promotion. Every new mayor tried to shut it down. Austin sent them the original letter. And carried on. He finally exited in 2025.</p></div>
-              <button class="tl-collapse-btn" onclick="collapseCard('spb')">Close ↑</button>
-            </div>
-          </div>
-        </div>
-        <div class="tl-node" data-side="left" data-era="pretech">
-          <div class="tl-connector"></div>
-          <div class="tl-dot tl-dot-warm"><div class="tl-dot-inner"></div></div>
-          <div class="tl-card tl-card-warm" id="card-social">
-            <div class="tl-card-front">
-              <div class="tl-card-dates">2012 – 2015</div>
-              <div class="tl-card-title">President & CEO</div>
-              <div class="tl-card-company">Socialutions Marketing & Consulting</div>
-              <div class="tl-card-highlights"><div class="tl-highlight">Built Facebook presences for local bars, hotels & restaurants</div>
-<div class="tl-highlight">Before most businesses knew they needed social media</div>
-<div class="tl-highlight">Spawned the St. Pete Beach page that became SPB</div></div>
-              <button class="tl-more-btn tl-more-warm" onclick="expandCard('social')">More ↓</button>
-            </div>
-            <div class="tl-card-expanded" id="expand-social">
-              <div class="tl-expand-body"><p>As Facebook was just finding its footing, Austin built Socialutions — going door to door to local bars, restaurants, hotels, and businesses, building out their Facebook pages, shooting promo photos, and managing their social presence before most businesses even understood what social media could do.</p>
-<p>He worked with national brands, political figures, real estate agents, law firms, and Tampa Bay area businesses. One page, St. Pete Beach, grew so big it had to become its own company — SPB.</p></div>
-              <button class="tl-collapse-btn" onclick="collapseCard('social')">Close ↑</button>
-            </div>
-          </div>
-        </div>
-        <div class="tl-node" data-side="right" data-era="pretech">
-          <div class="tl-connector"></div>
-          <div class="tl-dot tl-dot-warm"><div class="tl-dot-inner"></div></div>
-          <div class="tl-card tl-card-warm" id="card-redbull">
-            <div class="tl-card-front">
-              <div class="tl-card-dates">2012 – 2013</div>
-              <div class="tl-card-title">Brand Manager</div>
-              <div class="tl-card-company">Red Bull</div>
-              <div class="tl-card-highlights"><div class="tl-highlight">Catalyst for a new Red Bull business unit in Tampa Bay</div>
-<div class="tl-highlight">Created 'Red Bull Table Manners' — rolled out nationally</div>
-<div class="tl-highlight">Converted Jannus Live from a competitor product</div></div>
-              <button class="tl-more-btn tl-more-warm" onclick="expandCard('redbull')">More ↓</button>
-            </div>
-            <div class="tl-card-expanded" id="expand-redbull">
-              <div class="tl-expand-body"><p>Austin's SociaBULLS events program led to a connection with Red Bull, where he became a Brand Manager for the Tampa Bay market — serving as catalyst for the creation of a new business unit in the area.</p>
-<p>He created an On Premise Activation called 'Red Bull Table Manners' — a concept so effective it was rolled out in other markets. He also led the acquisition and conversion of one of the largest accounts in St. Petersburg, Jannus Live, away from a competitor's product.</p></div>
-              <button class="tl-collapse-btn" onclick="collapseCard('redbull')">Close ↑</button>
-            </div>
-          </div>
-        </div>
-        <div class="tl-node" data-side="left" data-era="pretech">
-          <div class="tl-connector"></div>
-          <div class="tl-dot tl-dot-warm"><div class="tl-dot-inner"></div></div>
-          <div class="tl-card tl-card-warm" id="card-flz">
-            <div class="tl-card-front">
-              <div class="tl-card-dates">2012 – 2013</div>
-              <div class="tl-card-title">On Air Personality — The Porcelain Prince</div>
-              <div class="tl-card-company">93.3 FLZ · Clear Channel</div>
-              <div class="tl-card-highlights"><div class="tl-highlight">On-air talent for the Rat & Puff Show</div>
-<div class="tl-highlight">Hosted and marketed off-site events & concerts</div>
-<div class="tl-highlight">Tampa Bay's most unexpectedly credentialed radio host</div></div>
-              <button class="tl-more-btn tl-more-warm" onclick="expandCard('flz')">More ↓</button>
-            </div>
-            <div class="tl-card-expanded" id="expand-flz">
-              <div class="tl-expand-body"><p>Known on air as 'The Porcelain Prince,' Austin served as an On Air Personality at 93.3 FLZ under Clear Channel Media & Entertainment. He assisted in creating on-air dialogue for the Rat & Puff Show and hosted and marketed the show's off-site promotional events and concerts across the Tampa Bay market.</p></div>
-              <button class="tl-collapse-btn" onclick="collapseCard('flz')">Close ↑</button>
-            </div>
-          </div>
-        </div>
-        <div class="tl-node" data-side="right" data-era="pretech">
-          <div class="tl-connector"></div>
-          <div class="tl-dot tl-dot-warm"><div class="tl-dot-inner"></div></div>
-          <div class="tl-card tl-card-warm" id="card-wave">
-            <div class="tl-card-front">
-              <div class="tl-card-dates">2010 – August 2015</div>
-              <div class="tl-card-title">Pro Skimboarder & Marketing Director</div>
-              <div class="tl-card-company">WaveZone Skimboards</div>
-              <div class="tl-card-highlights"><div class="tl-highlight">Competed professionally with full sponsor roster</div>
-<div class="tl-highlight">Grew into team manager then marketing director</div>
-<div class="tl-highlight">43% sales increase over three years</div></div>
-              <button class="tl-more-btn tl-more-warm" onclick="expandCard('wave')">More ↓</button>
-            </div>
-            <div class="tl-card-expanded" id="expand-wave">
-              <div class="tl-expand-body"><p>Austin went pro as a skimboarder for WaveZone Skimboards — competing, accumulating sponsors, and living the water sports life on St. Pete Beach. Over time his role evolved: team manager, then marketing director, developing the marketing strategies that grew the brand.</p>
-<p>He increased company sales by 43% over three years through new marketing strategies and managed the team of riders. Five years of pro skimboarding gave him something most people in business never get — the discipline, competitive drive, and comfort with failure that comes from pushing your physical limits.</p></div>
-              <button class="tl-collapse-btn" onclick="collapseCard('wave')">Close ↑</button>
-            </div>
-          </div>
-        </div>
-        <div class="tl-node" data-side="left" data-era="pretech">
-          <div class="tl-connector"></div>
-          <div class="tl-dot tl-dot-warm"><div class="tl-dot-inner"></div></div>
-          <div class="tl-card tl-card-warm" id="card-piazza">
-            <div class="tl-card-front">
-              <div class="tl-card-dates">2009 – 2015</div>
-              <div class="tl-card-title">Founder</div>
-              <div class="tl-card-company">Piazza Entertainment</div>
-              <div class="tl-card-highlights"><div class="tl-highlight">800+ people per week at weekly events</div>
-<div class="tl-highlight">Produced concerts: Jack Johnson, G-Eazy, Fat Joe & more</div>
-<div class="tl-highlight">DJ, event producer, and promoter across Tampa Bay</div></div>
-              <button class="tl-more-btn tl-more-warm" onclick="expandCard('piazza')">More ↓</button>
-            </div>
-            <div class="tl-card-expanded" id="expand-piazza">
-              <div class="tl-expand-body"><p>Piazza Entertainment was Austin's event production company — the vehicle behind six years of DJ sets, concert productions, and weekly events across the Tampa Bay area. At peak he was pulling 800+ people per week.</p>
-<p>He produced concerts featuring Jack Johnson, G-Eazy, Fat Joe, Outasight, and Shwayze — handling everything from booking and logistics to marketing and night-of production. This chapter taught him how to build an audience, manage operations under pressure, and make something from nothing.</p></div>
-              <button class="tl-collapse-btn" onclick="collapseCard('piazza')">Close ↑</button>
-            </div>
-          </div>
-        </div>
+        <!-- nodes injected by JS below -->
       </div>
     </div>
 
+    <!-- CERTS -->
     <div class="content-section" id="section-certs">
       <div class="section-eyebrow">Chapter 03</div>
       <h2 class="section-title"><em>Certifications</em></h2>
@@ -1258,6 +1186,7 @@
       </div>
     </div>
 
+    <!-- BUIDL -->
     <div class="content-section" id="section-buidl">
       <div class="section-eyebrow">Chapter 04</div>
       <h2 class="section-title">BUIDL</h2>
@@ -1267,6 +1196,7 @@
       </div>
     </div>
 
+    <!-- RESUME -->
     <div class="content-section" id="section-resume">
       <div class="section-eyebrow">Chapter 05</div>
       <h2 class="section-title">The <em>Resume</em></h2>
@@ -1275,189 +1205,388 @@
         <div class="placeholder-title">Full Resume — Coming Soon</div>
       </div>
     </div>
-
   </div>
 </div>
 
 <script>
-  // ── TYPEWRITER ──
-  function typeText(el, text, onDone) {
-    let i = 0;
-    let built = '';
-    function tick() {
-      if (i < text.length) {
-        const ch = text[i];
-        built += ch === '\n' ? '<br>' : ch;
-        el.innerHTML = built + '<span class="auxin-cursor"></span>';
-        i++;
-        const delay = (ch === '.' || ch === '?' || ch === '!') ? 160 :
-                      ch === ',' ? 65 : 20;
-        setTimeout(tick, delay);
-      } else {
-        el.innerHTML = built;
-        if (onDone) onDone();
-      }
+gsap.registerPlugin(ScrollTrigger);
+
+// ── CURSOR GLOW ──
+const glow = document.getElementById("cursorGlow");
+document.addEventListener("mousemove", e => {
+  gsap.to(glow, { x: e.clientX, y: e.clientY, duration: 0.6, ease: "power2.out" });
+});
+
+// ── WEBGL PARTICLES ──
+(function(){
+  const canvas = document.getElementById("glCanvas");
+  const gl = canvas.getContext("webgl");
+  if(!gl) return;
+
+  function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    gl.viewport(0,0,canvas.width,canvas.height);
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  const vsSource = `
+    attribute vec2 aPos;
+    attribute float aSize;
+    attribute float aAlpha;
+    varying float vAlpha;
+    void main(){
+      gl_Position = vec4(aPos, 0.0, 1.0);
+      gl_PointSize = aSize;
+      vAlpha = aAlpha;
     }
-    tick();
+  `;
+  const fsSource = `
+    precision mediump float;
+    uniform vec3 uColor;
+    varying float vAlpha;
+    void main(){
+      vec2 c = gl_PointCoord - 0.5;
+      float d = dot(c,c);
+      if(d > 0.25) discard;
+      float alpha = (1.0 - d*4.0) * vAlpha;
+      gl_FragColor = vec4(uColor, alpha);
+    }
+  `;
+
+  function makeShader(type, src){
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
   }
 
-  // ── LANDING INTRO ──
-  const msgEl = document.getElementById('landingMessage');
-  const optionsEl = document.getElementById('landingOptions');
+  const prog = gl.createProgram();
+  gl.attachShader(prog, makeShader(gl.VERTEX_SHADER, vsSource));
+  gl.attachShader(prog, makeShader(gl.FRAGMENT_SHADER, fsSource));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
 
-  const INTRO = "Hey, welcome in. Glad you stopped by.\n\nI'm Auxin — think of me as the AI that keeps the lights on around here. You've just walked into Austin's Bottega, his little corner of the internet where he keeps his work, his story, and everything he's been building.\n\nBefore I show you around — want me to tell you a little about the guy first, or would you rather just dive straight in?";
+  const N = 120;
+  const pos    = new Float32Array(N*2);
+  const vel    = new Float32Array(N*2);
+  const sizes  = new Float32Array(N);
+  const alphas = new Float32Array(N);
+  const phase  = new Float32Array(N);
 
-  const BACKGROUND = "Alright, here's the short version — though honestly, there's nothing short about this guy's story.\n\nAustin grew up right here on St. Pete Beach. Water in his blood from day one. He did a stint at UCF — surf team, obviously — then moved back home to be close to family. Finished his business degree at USF, then stuck around long enough to be one of the first people to graduate from there with an entrepreneurship degree. Which, if you know Austin, makes complete sense.\n\nFrom there things got interesting. He started SociaBULLS — an events and discount program for USF students. That landed him in front of Red Bull, where he became a brand manager in Tampa Bay. Around the same time he launched Socialutions, going door to door to local bars, restaurants and hotels building out their Facebook pages before most of them even knew what Facebook was.\n\nOne of those pages — the St. Pete Beach page — took on a life of its own. The city literally sent him a letter saying they didn't want it and never would. So he kept it. Built it into a media business. Millions of views a month. Sold it in 2025. Bittersweet, but still an exit.\n\nOh — and somewhere in there he ran for Mayor of St. Pete Beach. Still the youngest person to ever do it. Didn't win. Probably the best thing that ever happened to him.\n\nPro skimboarder for WaveZone. Licensed Florida investigator. DJ and event producer pulling 800+ people a week under Piazza Entertainment. The Porcelain Prince on 93.3 FLZ. You know — the usual.\n\nThen in late 2016 he met his mentor — the CEO of LiveAction — and that was it. Full nerd mode. He's been building in tech ever since.\n\nThese days he's married, has boy/girl twins, and still lives right here in St. Pete. When he's not working you'll find him at the beach with his kids, fishing, surfing, or building something — physical or digital. Always building.";
+  for(let i=0;i<N;i++){
+    pos[i*2]   = Math.random()*2-1;
+    pos[i*2+1] = Math.random()*2-1;
+    const speed = 0.0002 + Math.random()*0.0004;
+    const angle = Math.random()*Math.PI*2;
+    vel[i*2]   = Math.cos(angle)*speed;
+    vel[i*2+1] = Math.sin(angle)*speed;
+    sizes[i]   = 1.5 + Math.random()*3;
+    alphas[i]  = 0.2 + Math.random()*0.5;
+    phase[i]   = Math.random()*Math.PI*2;
+  }
 
-  const FOLLOW_UP = "Alright — now that you know who you're dealing with, where do you want to start?";
-  const SKIP_MSG  = "Sure — where do you want to start?";
+  const aBuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, aBuf);
+  const sizBuf = gl.createBuffer();
+  const alpBuf = gl.createBuffer();
 
-  setTimeout(() => {
-    typeText(msgEl, INTRO, () => {
-      setTimeout(() => {
-        optionsEl.style.display = 'flex';
-      }, 400);
-    });
-  }, 900);
+  const aPos  = gl.getAttribLocation(prog,"aPos");
+  const aSz   = gl.getAttribLocation(prog,"aSize");
+  const aAlp  = gl.getAttribLocation(prog,"aAlpha");
+  const uCol  = gl.getUniformLocation(prog,"uColor");
 
-  function handleChoice(choice) {
-    optionsEl.style.display = 'none';
+  gl.uniform3f(uCol, 0.16, 0.57, 0.57);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    if (choice === 'background') {
-      typeText(msgEl, BACKGROUND, () => {
-        setTimeout(() => {
-          // append follow-up as new paragraph
-          msgEl.innerHTML += '<br><br>';
-          const span = document.createElement('span');
-          msgEl.appendChild(span);
-          typeText(span, FOLLOW_UP, () => {
-            setTimeout(() => transitionToSplit(BACKGROUND + '\n\n' + FOLLOW_UP), 700);
-          });
-        }, 1100);
-      });
+  let mx = 0, my = 0;
+  document.addEventListener("mousemove", e=>{
+    mx = (e.clientX/window.innerWidth)*2-1;
+    my = -((e.clientY/window.innerHeight)*2-1);
+  });
+
+  let t = 0;
+  function draw(){
+    t += 0.008;
+    gl.clearColor(0,0,0,0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    for(let i=0;i<N;i++){
+      const dx = mx - pos[i*2];
+      const dy = my - pos[i*2+1];
+      const dist = Math.sqrt(dx*dx+dy*dy);
+      if(dist < 0.4){
+        pos[i*2]   += dx * 0.0008;
+        pos[i*2+1] += dy * 0.0008;
+      }
+      pos[i*2]   += vel[i*2];
+      pos[i*2+1] += vel[i*2+1];
+      if(pos[i*2]<-1.05) pos[i*2]=1.05;
+      if(pos[i*2]>1.05)  pos[i*2]=-1.05;
+      if(pos[i*2+1]<-1.05) pos[i*2+1]=1.05;
+      if(pos[i*2+1]>1.05)  pos[i*2+1]=-1.05;
+      alphas[i] = (0.2 + Math.random()*0.05) + Math.sin(t + phase[i]) * 0.15;
+    }
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, aBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, pos, gl.DYNAMIC_DRAW);
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, sizBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, sizes, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(aSz);
+    gl.vertexAttribPointer(aSz, 1, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, alpBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, alphas, gl.DYNAMIC_DRAW);
+    gl.enableVertexAttribArray(aAlp);
+    gl.vertexAttribPointer(aAlp, 1, gl.FLOAT, false, 0, 0);
+
+    gl.drawArrays(gl.POINTS, 0, N);
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── TYPEWRITER ──
+function typeText(el, text, onDone){
+  let i=0, built="";
+  function tick(){
+    if(i<text.length){
+      const ch=text[i];
+      built += ch==="
+" ? "<br>" : ch;
+      el.innerHTML = built + '<span class="auxin-cursor"></span>';
+      i++;
+      const delay = (ch==="."||ch==="?"||ch==="!") ? 160 : ch==="," ? 65 : 20;
+      setTimeout(tick, delay);
     } else {
-      typeText(msgEl, SKIP_MSG, () => {
-        setTimeout(() => transitionToSplit(SKIP_MSG), 600);
-      });
+      el.innerHTML = built;
+      if(onDone) onDone();
     }
   }
+  tick();
+}
 
-  // ── TRANSITION ──
-  function transitionToSplit(fullText) {
-    const landing  = document.getElementById('landing');
-    const split    = document.getElementById('splitView');
-    const messages = document.getElementById('chatMessages');
+// ── COPY ──
+const INTRO = "Hey, welcome in. Glad you stopped by.\n\nI'm Auxin — the AI that keeps the lights on around here. You've just walked into Austin's Bottega, his little corner of the internet where he keeps his work, his story, and everything he's been building.\n\nBefore I show you around — want me to tell you a little about him first, or would you rather just dive straight in?";
 
-    // build chat bubble from conversation
-    const paragraphs = fullText.split('\n\n').filter(p => p.trim());
-    const bubble = document.createElement('div');
-    bubble.className = 'chat-bubble';
-    bubble.innerHTML = paragraphs.map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
-    messages.appendChild(bubble);
+const BACKGROUND = "Sure — let me introduce you to the guy.\n\nAustin Piazza grew up on St. Pete Beach, Florida. Water in his blood from day one. He spent time at UCF on the surf team, then moved back home to be close to family. He finished his business degree at USF, and then stuck around long enough to become one of the first people to graduate from there with an entrepreneurship degree.\n\nFrom there, things got interesting fast. He launched SociaBULLS, an events and discount program for USF students. That caught the attention of Red Bull, where he became a brand manager for the Tampa Bay market. Simultaneously he started Socialutions — going door to door to local bars, restaurants, and hotels, building out their Facebook pages before most businesses even knew what social media was.\n\nOne of those pages — for St. Pete Beach — took on a life of its own. The city of St. Pete Beach sent him a letter saying they didn't want it and never would. So he kept it. For years it pulled millions of views a month. He eventually sold the business in 2025.\n\nOh — and somewhere in all that, he ran for Mayor of St. Pete Beach. He's still the youngest person to ever do it. Didn't win. Looking back, probably the best thing that could have happened.\n\nHe also competed professionally as a skimboarder for WaveZone, picked up sponsors, and worked his way up to team and marketing manager. He got a Florida Investigator license. He produced live events under Piazza Entertainment pulling 800+ people a week, featuring artists like Jack Johnson and G-Eazy. He was even on the radio — 93.3 FLZ called him the Porcelain Prince.\n\nThen in late 2016, he met the CEO of LiveAction — his mentor — and made the full pivot into tech. He's been building in the industry ever since.\n\nThese days he's married, has boy/girl twins, and still lives in St. Pete. When he's not working, you'll find him at the beach with his kids, fishing, surfing, or building something — physical or digital.";
 
-    const hint = document.createElement('div');
-    hint.className = 'chat-hint';
-    hint.textContent = 'Choose a section to explore ↓';
-    messages.appendChild(hint);
+const FOLLOW_UP = "Alright — now you know the story. Where do you want to start?";
+const SKIP_MSG  = "No problem — where do you want to start?";
 
-    // animate transition
-    landing.classList.add('exit');
-    setTimeout(() => {
-      landing.style.display = 'none';
-      split.classList.add('active');
-    }, 560);
+const msgEl = document.getElementById("landingMessage");
+const optEl = document.getElementById("landingOptions");
+
+setTimeout(()=>{
+  typeText(msgEl, INTRO, ()=>{
+    setTimeout(()=>{ optEl.style.display="flex"; }, 400);
+  });
+}, 900);
+
+function handleChoice(choice){
+  optEl.style.display="none";
+  if(choice==="background"){
+    typeText(msgEl, BACKGROUND, ()=>{
+      setTimeout(()=>{
+        msgEl.innerHTML += "<br><br>";
+        const span = document.createElement("span");
+        msgEl.appendChild(span);
+        typeText(span, FOLLOW_UP, ()=>{
+          setTimeout(()=>transitionToSplit(BACKGROUND+"\n\n"+FOLLOW_UP), 700);
+        });
+      }, 1000);
+    });
+  } else {
+    typeText(msgEl, SKIP_MSG, ()=>{
+      setTimeout(()=>transitionToSplit(SKIP_MSG), 600);
+    });
   }
+}
 
-  // ── SECTION NAV ──
-  function showSection(id) {
-    document.getElementById('contentEmpty').style.display = 'none';
-    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.chat-nav-btn').forEach(b => b.classList.remove('active-section'));
+function transitionToSplit(fullText){
+  const landing = document.getElementById("landing");
+  const split   = document.getElementById("splitView");
+  const msgs    = document.getElementById("chatMessages");
 
-    const section = document.getElementById('section-' + id);
-    const btn     = document.getElementById('btn-' + id);
-    if (section) section.classList.add('active');
-    if (btn) btn.classList.add('active-section');
-    document.getElementById('contentPanel').scrollTo({ top: 0, behavior: 'smooth' });
-  }
+  const paras = fullText.split("\n\n").filter(p=>p.trim());
+  const bubble = document.createElement("div");
+  bubble.className = "chat-bubble";
+  bubble.innerHTML = paras.map(p=>`<p>${p.replace(/\n/g,"<br>")}</p>`).join("");
+  msgs.appendChild(bubble);
 
-  // ── DIVIDER DRAG ──
-  const divider   = document.getElementById('divider');
-  const chatPanel = document.getElementById('chatPanel');
-  let dragging    = false;
+  const hint = document.createElement("div");
+  hint.className = "chat-hint";
+  hint.textContent = "Choose a section to explore ↓";
+  msgs.appendChild(hint);
 
-  divider.addEventListener('mousedown', e => {
-    dragging = true;
-    divider.classList.add('dragging');
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-    e.preventDefault();
-  });
+  landing.classList.add("exit");
+  setTimeout(()=>{
+    landing.style.display="none";
+    split.classList.add("active");
+    buildTimeline();
+    setTimeout(initTimelineObserver, 200);
+  }, 700);
+}
 
-  document.addEventListener('mousemove', e => {
-    if (!dragging) return;
-    const rect = document.getElementById('splitView').getBoundingClientRect();
-    let w = e.clientX - rect.left;
-    w = Math.max(260, Math.min(w, window.innerWidth * 0.55));
-    chatPanel.style.width = w + 'px';
-  });
+// ── SECTION NAV ──
+function showSection(id){
+  document.getElementById("contentEmpty").style.display="none";
+  document.querySelectorAll(".content-section").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".chat-nav-btn").forEach(b=>b.classList.remove("active-section"));
+  const section = document.getElementById("section-"+id);
+  const btn     = document.getElementById("btn-"+id);
+  if(section) section.classList.add("active");
+  if(btn) btn.classList.add("active-section");
+  document.getElementById("contentPanel").scrollTo({top:0,behavior:"smooth"});
+  if(id==="work") setTimeout(initTimelineObserver, 100);
+}
 
-  document.addEventListener('mouseup', () => {
-    if (!dragging) return;
-    dragging = false;
-    divider.classList.remove('dragging');
-    document.body.style.cursor = '';
-    document.body.style.userSelect = '';
-  });
+// ── TIMELINE DATA ──
+const NODES = [
+  {id:"ais",side:"right",era:"tech",dates:"March 2025 – Present",title:"Head of Growth Strategy",company:"AI Squared",
+   hi:["Leading mid-market GTM — pipeline, acquisition, revenue","Building & leading BDRs and Account Executives","Shipping Claude-powered tools and AI workflows for clients"],
+   body:["At AI Squared, Austin operates at the intersection of sales leadership and hands-on AI implementation. He spearheads the mid-market GTM plan — building pipeline, driving acquisition, and owning revenue across verticals including finance, healthcare, and manufacturing.","He recruits, trains, and leads BDRs and Account Executives, implementing KPIs and conversion processes while serving as the primary escalation point for enterprise clients. He uses 19 AI certifications earned in 2026 to build and deploy custom Claude-powered workflows — including Data Scientist in a Box, DataMatch, and Notes to Quote.","He identified and personally scoped all Sparx use cases, built the prototypes, and handled concept, messaging, branding, and positioning end-to-end. AI Squared's UNIFI platform is trusted by the U.S. DoD, Coca-Cola, Vanguard, and Nationwide."]},
+  {id:"consult",side:"left",era:"tech",dates:"December 2025 – Present",title:"Independent AI Consultant",company:"Freelance",
+   hi:["Claude-powered tools and workflows for SMB clients","Rapid prototyping, prompt engineering, deployment","Home services, watersports, fabrication and more"],
+   body:["Running a parallel independent practice, Austin builds and deploys AI-powered tools for small and mid-sized businesses — AI use case scoping, workflow design, prompt engineering, rapid prototyping, and client-facing tool deployment.","Every engagement starts with discovery to identify high-value automation opportunities, then moves into build — typically Claude-powered tools delivered as standalone apps or embedded workflows."]},
+  {id:"anydesk",side:"right",era:"tech",dates:"May 2023 – March 2025",title:"Director of Go-To-Market",company:"AnyDesk",
+   hi:["31% NRR increase in 9 months via retention team","Scaled team to 17 with global + regional managers","Rebuilt customer lifecycle, playbooks, and sales ops"],
+   body:["AnyDesk had 200,000 customers across 190 countries but was struggling with churn and revenue leakage. Austin built a dedicated retention team from scratch — achieving a 31% increase in NRR within 9 months, scaling to 17 members with global and regional manager layers.","He developed sales playbooks, objection-tracking frameworks, and a commercial terms dictionary. He redesigned the end-to-end customer lifecycle, ran cohort analysis to build targeted campaigns, and supported a full sales org restructuring during a leadership transition."]},
+  {id:"chainstack",side:"left",era:"tech",dates:"December 2021 – May 2023",title:"Head of Growth & Sales",company:"Chainstack",
+   hi:["Scaled org from 8 → 120 in de facto CEO capacity","Built sales, CS, partnerships, devrel & marketing","500% ARR growth in 2022 across DeFi, Gaming, NFTs"],
+   body:["During a CEO transition, Austin stepped in and ran Chainstack's entire commercial operation — sales, customer success, marketing, demand generation, developer relations, and partnerships. He owned the company sales goal outright.","He built every team from the ground up: Account Executives, Developer Relations reps, Customer Success, a Partnerships team, and eventually a Marketing Director. He secured cloud partnerships with AWS, GCP, Azure, and Virtuozzo, and represented Chainstack at global events.","The result: 500% ARR growth in 2022 — but more importantly, a full commercial infrastructure that could sustain growth well beyond that initial spike."]},
+  {id:"slash",side:"right",era:"tech",dates:"March 2021 – December 2021",title:"Director of Sales",company:"SlashNext",
+   hi:["Promoted from Sales Manager to Director in 5 months","Led regional team across enterprise accounts","AI-powered anti-phishing, Silicon Valley HQ"],
+   body:["Austin joined SlashNext as a Sales Manager and was promoted to Director of Sales within 5 months — a reflection of the leadership trajectory he tends to follow at every company.","SlashNext is a Silicon Valley cybersecurity company with patented AI-powered anti-phishing technology — protecting employees, brands, and networks across browsers, endpoints, and social media with a 99.07% detection rate."]},
+  {id:"spin",side:"left",era:"tech",dates:"March 2020 – March 2021",title:"Sales Manager",company:"Spin Technology",
+   hi:["Cloud data protection for Google Workspace & M365","AI-powered 24/7 threat detection","Drove new enterprise business"],
+   body:["At Spin Technology, Austin led sales for a Palo Alto-based cloud data protection platform securing Google Workspace and Microsoft 365 environments against ransomware, human error, and insider threats. The platform used AI for 24/7 monitoring and automated countermeasures."]},
+  {id:"live",side:"right",era:"tech",dates:"January 2017 – December 2019",title:"Sales Manager",company:"LiveAction",
+   hi:["Where the tech career began — mentored by the CEO","Rose from CS → Global Account Mgmt → Sales","Network performance management for Cisco"],
+   body:["LiveAction is where it all started. In late 2016, Austin met LiveAction's CEO — his mentor — and made the full pivot into tech. He joined as a Customer Success Manager and spent three years growing: Customer Success Manager → Manager of Global Account Management → Sales Manager.","Each step built on the last. Customer success gave him product depth. Global account management gave him enterprise skills. Sales management gave him the playbook he'd carry into every role that followed."]},
+  {id:"__divider__",side:null,era:null,dates:null,title:null,company:null,hi:[],body:[]},
+  {id:"symphony",side:"left",era:"pretech",dates:"August 2015 – December 2016",title:"Strategic Marketing Director",company:"The Symphony Agency (now Allegrow)",
+   hi:["First corporate role after years of entrepreneurship","Led client strategy, account management, marketing","Bridge between entrepreneurship and tech"],
+   body:["After years of running his own ventures, Austin joined The Symphony Agency as Strategic Marketing Director — his first corporate role. He led client communication, account management, and strategic marketing plan development. The agency later rebranded to Allegrow.","This role served as the bridge between his entrepreneurial chapter and his tech career, building the strategic and client management skills he'd carry into B2B SaaS."]},
+  {id:"spb",side:"right",era:"pretech",dates:"2013 – 2017 · Exited 2025",title:"Founder & Owner",company:"St. Pete Beach LLC (SPB)",
+   hi:["Built from a Facebook page to a full media business","Millions of monthly views — advertising, journalism, tourism","The city tried to shut it down. He sent them their letter."],
+   body:["What started as a Facebook page for St. Pete Beach grew into a full media business. When Austin launched it, the city sent him a letter saying they didn't want it and never would. So he kept it. For years it pulled millions of views per month.","SPB expanded into advertising sales, journalism, and tourism promotion. Every new mayor tried to shut it down. Austin sent them the original letter. And carried on. He finally exited in 2025."]},
+  {id:"social",side:"left",era:"pretech",dates:"2012 – 2015",title:"President & CEO",company:"Socialutions Marketing & Consulting",
+   hi:["Built Facebook presences for local businesses","Before most knew they needed social media","Spawned the St. Pete Beach page that became SPB"],
+   body:["Austin built Socialutions going door to door to local bars, restaurants, hotels, and businesses — building out their Facebook pages, shooting promo photos, and managing their social presence before most businesses understood what social media could do.","He worked with national brands, political figures, real estate agents, and Tampa Bay area businesses. One page, St. Pete Beach, grew so big it became its own company — SPB."]},
+  {id:"redbull",side:"right",era:"pretech",dates:"2012 – 2013",title:"Brand Manager",company:"Red Bull",
+   hi:["Catalyst for a new Red Bull business unit in Tampa Bay","Created 'Red Bull Table Manners' — rolled out nationally","Converted Jannus Live from a competitor product"],
+   body:["Austin's SociaBULLS program led to a connection with Red Bull, where he became Brand Manager for the Tampa Bay market — catalyst for the creation of a new business unit in the area.","He created 'Red Bull Table Manners,' an On Premise Activation so effective it was rolled out nationally. He also led the acquisition of Jannus Live, one of the largest accounts in St. Petersburg, away from a competitor."]},
+  {id:"flz",side:"left",era:"pretech",dates:"2012 – 2013",title:"The Porcelain Prince — On Air Personality",company:"93.3 FLZ · Clear Channel",
+   hi:["On-air talent for the Rat & Puff Show","Hosted and marketed off-site events & concerts","Tampa Bay's most unexpectedly credentialed radio host"],
+   body:["Known on air as the Porcelain Prince, Austin served as an On Air Personality at 93.3 FLZ under Clear Channel Media & Entertainment. He assisted in creating on-air dialogue for the Rat & Puff Show and hosted and marketed the show's off-site promotional events and concerts across Tampa Bay."]},
+  {id:"wave",side:"right",era:"pretech",dates:"2010 – August 2015",title:"Pro Skimboarder & Marketing Director",company:"WaveZone Skimboards",
+   hi:["Competed professionally with full sponsor roster","Grew into team manager then marketing director","43% sales increase in three years"],
+   body:["Austin went pro as a skimboarder for WaveZone Skimboards — competing, accumulating sponsors, and living the water sports life on St. Pete Beach. His role evolved from athlete to team manager to marketing director.","He increased company sales by 43% over three years and managed the team of riders. Five years of pro skimboarding gave him the discipline and competitive drive he'd carry into every business chapter that followed."]},
+  {id:"piazza",side:"left",era:"pretech",dates:"2009 – 2015",title:"Founder",company:"Piazza Entertainment",
+   hi:["800+ people per week at weekly events","Produced: Jack Johnson, G-Eazy, Fat Joe & more","DJ, event producer, promoter across Tampa Bay"],
+   body:["Piazza Entertainment was Austin's event production company — the vehicle behind six years of DJ sets, concert productions, and weekly events across the Tampa Bay area. At peak he was pulling 800+ people per week.","He produced concerts featuring Jack Johnson, G-Eazy, Fat Joe, Outasight, and Shwayze — handling booking, logistics, marketing, and night-of production. This chapter taught him to build an audience and make something from nothing."]}
+];
 
-  divider.addEventListener('touchstart', e => { dragging = true; e.preventDefault(); }, { passive: false });
+function buildTimeline(){
+  const wrapper = document.getElementById("timelineWrapper");
+  if(!wrapper || wrapper.dataset.built) return;
+  wrapper.dataset.built = "1";
 
-  document.addEventListener('touchmove', e => {
-    if (!dragging) return;
-    const t = e.touches[0];
-    const rect = document.getElementById('splitView').getBoundingClientRect();
-    let w = t.clientX - rect.left;
-    w = Math.max(260, Math.min(w, window.innerWidth * 0.55));
-    chatPanel.style.width = w + 'px';
-  }, { passive: true });
-
-  document.addEventListener('touchend', () => { dragging = false; });
-
-  // ── TIMELINE EXPAND/COLLAPSE ──
-  function expandCard(id) {
-    const exp = document.getElementById('expand-' + id);
-    if (exp) {
-      exp.classList.add('open');
-      exp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  NODES.forEach(n=>{
+    if(n.id==="__divider__"){
+      wrapper.innerHTML += `
+        <div class="era-divider">
+          <div class="era-divider-inner">
+            <div class="era-divider-line"></div>
+            <div class="era-divider-text">2016 — The Pivot</div>
+            <div class="era-divider-line"></div>
+          </div>
+        </div>
+        <div class="era-label"><span class="era-badge era-pre-badge">Pre-Tech Era</span></div>`;
+      return;
     }
-  }
+    const warm = n.era==="pretech";
+    const dc   = warm?"tl-dot tl-dot-warm":"tl-dot";
+    const cc   = warm?"tl-card tl-card-warm":"tl-card";
+    const bc   = warm?"tl-more-btn tl-more-warm":"tl-more-btn";
+    const hi   = n.hi.map(h=>`<div class="tl-highlight">${h}</div>`).join("");
+    const body = n.body.map(p=>`<p>${p}</p>`).join("");
+    wrapper.innerHTML += `
+      <div class="tl-node" data-side="${n.side}" data-era="${n.era}">
+        <div class="tl-connector"></div>
+        <div class="${dc}"><div class="tl-dot-inner"></div></div>
+        <div class="${cc}" id="card-${n.id}">
+          <div class="tl-card-front">
+            <div class="tl-card-dates">${n.dates}</div>
+            <div class="tl-card-title">${n.title}</div>
+            <div class="tl-card-company">${n.company}</div>
+            <div class="tl-card-highlights">${hi}</div>
+            <button class="${bc}" onclick="expandCard('${n.id}')">More ↓</button>
+          </div>
+          <div class="tl-card-expanded" id="expand-${n.id}">
+            <div class="tl-expand-body">${body}</div>
+            <button class="tl-collapse-btn" onclick="collapseCard('${n.id}')">Close ↑</button>
+          </div>
+        </div>
+      </div>`;
+  });
+}
 
-  function collapseCard(id) {
-    const exp = document.getElementById('expand-' + id);
-    if (exp) exp.classList.remove('open');
-  }
+function expandCard(id){
+  const el = document.getElementById("expand-"+id);
+  if(el){ el.classList.add("open"); el.scrollIntoView({behavior:"smooth",block:"nearest"}); }
+}
 
-  // ── INTERSECTION OBSERVER for scroll-in animation ──
-  const tlObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('visible'), i * 80);
-        tlObserver.unobserve(entry.target);
+function collapseCard(id){
+  const el = document.getElementById("expand-"+id);
+  if(el) el.classList.remove("open");
+}
+
+function initTimelineObserver(){
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach((entry,i)=>{
+      if(entry.isIntersecting){
+        setTimeout(()=>entry.target.classList.add("visible"), i*80);
+        obs.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.15 });
+  },{threshold:0.12, root: document.getElementById("contentPanel")});
+  document.querySelectorAll(".tl-node").forEach(n=>obs.observe(n));
+}
 
-  function initTimeline() {
-    document.querySelectorAll('.tl-node').forEach(node => tlObserver.observe(node));
-  }
+// ── DIVIDER DRAG ──
+const divider   = document.getElementById("divider");
+const chatPanel = document.getElementById("chatPanel");
+let dragging = false;
 
-  // re-init when work section is shown
-  const _origShowSection = showSection;
-  showSection = function(id) {
-    _origShowSection(id);
-    if (id === 'work') setTimeout(initTimeline, 100);
-  };
+divider.addEventListener("mousedown", e=>{
+  dragging=true;
+  divider.classList.add("dragging");
+  document.body.style.cursor="col-resize";
+  document.body.style.userSelect="none";
+  e.preventDefault();
+});
 
+document.addEventListener("mousemove", e=>{
+  if(!dragging) return;
+  const rect = document.getElementById("splitView").getBoundingClientRect();
+  let w = e.clientX - rect.left;
+  w = Math.max(260, Math.min(w, window.innerWidth*0.55));
+  chatPanel.style.width = w+"px";
+});
+
+document.addEventListener("mouseup", ()=>{
+  if(!dragging) return;
+  dragging=false;
+  divider.classList.remove("dragging");
+  document.body.style.cursor="";
+  document.body.style.userSelect="";
+});
 </script>
 </body>
 </html>
